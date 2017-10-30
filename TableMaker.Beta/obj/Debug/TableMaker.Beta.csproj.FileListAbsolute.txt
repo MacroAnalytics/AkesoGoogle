@@ -1,0 +1,15 @@
+H:\WebTrafficAnalysis.Git\TableMaker.Beta\bin\Debug\TableMaker.Beta.dll
+H:\WebTrafficAnalysis.Git\TableMaker.Beta\bin\Debug\TableMaker.Beta.pdb
+H:\WebTrafficAnalysis.Git\TableMaker.Beta\bin\Debug\Dapper.dll
+H:\WebTrafficAnalysis.Git\TableMaker.Beta\bin\Debug\Dapper.xml
+H:\WebTrafficAnalysis.Git\TableMaker.Beta\obj\Debug\TableMaker.Beta.csproj.CoreCompileInputs.cache
+H:\WebTrafficAnalysis.Git\TableMaker.Beta\obj\Debug\TableMaker.Beta.dll
+H:\WebTrafficAnalysis.Git\TableMaker.Beta\obj\Debug\TableMaker.Beta.pdb
+H:\DriveImporter\GoogleDriveExcelImporter\TableMaker.Beta\bin\Debug\TableMaker.Beta.dll
+H:\DriveImporter\GoogleDriveExcelImporter\TableMaker.Beta\bin\Debug\TableMaker.Beta.pdb
+H:\DriveImporter\GoogleDriveExcelImporter\TableMaker.Beta\bin\Debug\Dapper.dll
+H:\DriveImporter\GoogleDriveExcelImporter\TableMaker.Beta\bin\Debug\Dapper.xml
+H:\DriveImporter\GoogleDriveExcelImporter\TableMaker.Beta\obj\Debug\TableMaker.Beta.csprojResolveAssemblyReference.cache
+H:\DriveImporter\GoogleDriveExcelImporter\TableMaker.Beta\obj\Debug\TableMaker.Beta.csproj.CoreCompileInputs.cache
+H:\DriveImporter\GoogleDriveExcelImporter\TableMaker.Beta\obj\Debug\TableMaker.Beta.dll
+H:\DriveImporter\GoogleDriveExcelImporter\TableMaker.Beta\obj\Debug\TableMaker.Beta.pdb
