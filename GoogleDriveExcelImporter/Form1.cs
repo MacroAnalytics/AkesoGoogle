@@ -71,8 +71,43 @@ namespace GoogleDriveExcelImporter
             return credential;
         }
 
+        public void DisableAllTextBoxes()
+        {
+            nudStartCopyAtRow.Enabled = false;
+            txtTableName.Enabled = false;
+            ddlAuthenticationType.Enabled = false;
+            txtUserName.Enabled = false;
+            txtInitialCata.Enabled = false;
+            nudStartCopyAtRow.Enabled = false;
+            txtPassword.Enabled = false;
+            txtDataSource.Enabled = false;
+            txtApiKey.Enabled = false;
+            txtAppName.Enabled = false;
+            txtApplicationName.Enabled = false;
+            txtFileName.Enabled = false;
+            chkHeadings.Enabled = false;
+        }
+
+        public void EnableAllTextBoxes()
+        {
+            nudStartCopyAtRow.Enabled = true;
+            txtTableName.Enabled = true;
+            ddlAuthenticationType.Enabled = true;
+            txtUserName.Enabled = true;
+            txtInitialCata.Enabled = true;
+            nudStartCopyAtRow.Enabled = true;
+            txtPassword.Enabled = true;
+            txtDataSource.Enabled = true;
+            txtApiKey.Enabled = true;
+            txtAppName.Enabled = true;
+            txtApplicationName.Enabled = true;
+            txtFileName.Enabled = true;
+            chkHeadings.Enabled = true;
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
+            DisableAllTextBoxes();
             try
             {
                 ServiceMessage("Running");
@@ -240,7 +275,9 @@ namespace GoogleDriveExcelImporter
             catch(Exception ex)
             {
                 ServiceMessage(ex.Message);
+                EnableAllTextBoxes();
             }
+            EnableAllTextBoxes();
         }
 
         private void ServiceMessage(string item)
@@ -330,6 +367,7 @@ namespace GoogleDriveExcelImporter
 
         private void button2_Click(object sender, EventArgs e)
         {
+            EnableAllTextBoxes();
             running = false;
         }
 
