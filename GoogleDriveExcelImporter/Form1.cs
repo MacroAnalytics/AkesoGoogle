@@ -73,211 +73,233 @@ namespace GoogleDriveExcelImporter
 
         public void DisableAllTextBoxes()
         {
-            nudStartCopyAtRow.Enabled = false;
-            txtTableName.Enabled = false;
-            ddlAuthenticationType.Enabled = false;
-            txtUserName.Enabled = false;
-            txtInitialCata.Enabled = false;
-            nudStartCopyAtRow.Enabled = false;
-            txtPassword.Enabled = false;
-            txtDataSource.Enabled = false;
-            txtApiKey.Enabled = false;
-            txtAppName.Enabled = false;
-            txtApplicationName.Enabled = false;
-            txtFileName.Enabled = false;
-            chkHeadings.Enabled = false;
+            lstOutput.Invoke(new MethodInvoker(() =>
+            {
+                nudStartCopyAtRow.Enabled = false;
+                txtTableName.Enabled = false;
+                ddlAuthenticationType.Enabled = false;
+                txtUserName.Enabled = false;
+                txtInitialCata.Enabled = false;
+                nudStartCopyAtRow.Enabled = false;
+                txtPassword.Enabled = false;
+                txtDataSource.Enabled = false;
+                txtApiKey.Enabled = false;
+                txtAppName.Enabled = false;
+                txtApplicationName.Enabled = false;
+                txtFileName.Enabled = false;
+                chkHeadings.Enabled = false;
+            }));
         }
 
         public void EnableAllTextBoxes()
         {
-            nudStartCopyAtRow.Enabled = true;
-            txtTableName.Enabled = true;
-            ddlAuthenticationType.Enabled = true;
-            txtUserName.Enabled = true;
-            txtInitialCata.Enabled = true;
-            nudStartCopyAtRow.Enabled = true;
-            txtPassword.Enabled = true;
-            txtDataSource.Enabled = true;
-            txtApiKey.Enabled = true;
-            txtAppName.Enabled = true;
-            txtApplicationName.Enabled = true;
-            txtFileName.Enabled = true;
-            chkHeadings.Enabled = true;
+            lstOutput.Invoke(new MethodInvoker(() =>
+            {
+                nudStartCopyAtRow.Enabled = true;
+                txtTableName.Enabled = true;
+                ddlAuthenticationType.Enabled = true;
+                txtUserName.Enabled = true;
+                txtInitialCata.Enabled = true;
+                nudStartCopyAtRow.Enabled = true;
+                txtPassword.Enabled = true;
+                txtDataSource.Enabled = true;
+                txtApiKey.Enabled = true;
+                txtAppName.Enabled = true;
+                txtApplicationName.Enabled = true;
+                txtFileName.Enabled = true;
+                chkHeadings.Enabled = true;
+            }));
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            DisableAllTextBoxes();
-            try
-            {
-                ServiceMessage("Running");
-                running = true;
-                ForceCopy = true;
-                while (running)
+            var bw = new BackgroundWorker();
+            var textResult = ddlAuthenticationType.Text?.ToLower();
+
+            bw.DoWork += (o, args) => {
+
+                DisableAllTextBoxes();
+                try
                 {
-                    var services = new DriveService(new BaseClientService.Initializer()
+                    ServiceMessage("Running");
+                    running = true;
+                    ForceCopy = true;
+                    while (running)
                     {
-                        HttpClientInitializer = GetCredential(),
-                        ApplicationName = txtAppName.Text,
-                    });
-
-                    var files = GetFiles(services, txtFileName.Text);
-                    var file = files.First();
-
-                    if (LastCopied == null || LastCopied != file.ModifiedDate || ForceCopy == true)
-                    {
-                        ForceCopy = false;
-
-                        try
+                        var services = new DriveService(new BaseClientService.Initializer()
                         {
-                            System.IO.File.Delete(file.Title);
-                        }
-                        catch { }
+                            HttpClientInitializer = GetCredential(),
+                            ApplicationName = txtAppName.Text,
+                        });
 
-                        var result = downloadFile(services, file, file.Title);
+                        var files = GetFiles(services, txtFileName.Text);
+                        var file = files.First();
 
-                        var package = new ExcelPackage(new FileInfo(file.Title));
-
-                        ExcelWorksheet workSheet = package.Workbook.Worksheets.First();
-                        var start = workSheet.Dimension.Start;
-                        var end = workSheet.Dimension.End;
-
-                        var take = RuleHelper.CalcBatchSize(end.Column);
-                        var sbQueryBuilder = new StringBuilder();
-                        var parameters = new DynamicParameters();
-                        var sqlDestinationTableName = txtTableName.Text;
-                        var sqlValueHeadings = new Dictionary<string, string>();
-
-
-                        #region Connection Builder
-
-                        SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-                        if (ddlAuthenticationType.Text?.ToLower().Contains("windows authentication") != true)
+                        if (LastCopied == null || LastCopied != file.ModifiedDate || ForceCopy == true)
                         {
-                            builder.Authentication = SqlAuthenticationMethod.SqlPassword;
-                            builder.IntegratedSecurity = false;
-                            builder.InitialCatalog = txtInitialCata.Text;
-                            builder.Password = txtPassword.Text;
-                            builder.UserID = txtUserName.Text;
-                            builder.DataSource = txtDataSource.Text;
-                        }
-                        else
-                        {
-                            builder.IntegratedSecurity = true;
-                            builder.InitialCatalog = txtInitialCata.Text;
-                            builder.DataSource = txtDataSource.Text;
-                        }
+                            ForceCopy = false;
 
-                        #endregion
-
-                        var skip = 0;
-                        if (nudStartCopyAtRow.Value > 0)
-                            skip = (int)nudStartCopyAtRow.Value;
-
-                        while (skip < end.Row)
-                        {
-                            var selectedRage = new List<string[]>();
-
-                            if (skip == 0)
+                            try
                             {
-                                ServiceMessage("Attempting to overwrite table - Skip" + skip);
+                                System.IO.File.Delete(file.Title);
+                            }
+                            catch { }
 
-                                var startHeadingRow = nudStartCopyAtRow.Value > 0 ? (int)nudStartCopyAtRow.Value : start.Row;
-                                if (chkHeadings.Checked)
+                            var result = downloadFile(services, file, file.Title);
+
+                            var package = new ExcelPackage(new FileInfo(file.Title));
+
+                            ExcelWorksheet workSheet = package.Workbook.Worksheets.First();
+                            var start = workSheet.Dimension.Start;
+                            var end = workSheet.Dimension.End;
+
+                            var take = RuleHelper.CalcBatchSize(end.Column);
+                            var sbQueryBuilder = new StringBuilder();
+                            var parameters = new DynamicParameters();
+                            var sqlDestinationTableName = txtTableName.Text;
+                            var sqlValueHeadings = new Dictionary<string, string>();
+
+
+                            #region Connection Builder
+
+                            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+
+                            if (textResult.Contains("windows authentication") != true)
+                            {
+                                builder.Authentication = SqlAuthenticationMethod.SqlPassword;
+                                builder.IntegratedSecurity = false;
+                                builder.InitialCatalog = txtInitialCata.Text;
+                                builder.Password = txtPassword.Text;
+                                builder.UserID = txtUserName.Text;
+                                builder.DataSource = txtDataSource.Text;
+                            }
+                            else
+                            {
+                                builder.IntegratedSecurity = true;
+                                builder.InitialCatalog = txtInitialCata.Text;
+                                builder.DataSource = txtDataSource.Text;
+                            }
+
+                            #endregion
+
+                            var skip = 0;
+                            if (nudStartCopyAtRow.Value > 0)
+                                skip = (int)nudStartCopyAtRow.Value;
+
+                            while (skip < end.Row)
+                            {
+                                var selectedRage = new List<string[]>();
+
+                                if (skip == 0)
                                 {
+                                    ServiceMessage("Attempting to overwrite table - Skip" + skip);
+
+                                    var startHeadingRow = nudStartCopyAtRow.Value > 0 ? (int)nudStartCopyAtRow.Value : start.Row;
+                                    if (chkHeadings.Checked)
+                                    {
+                                        for (int col = start.Column; col <= end.Column; col++)
+                                        {
+                                            var cellValue = workSheet.Cells[startHeadingRow, col].Text;
+                                            if (cellValue == null)
+                                                cellValue = $"col_{col}";
+
+                                            if(cellValue != null && sqlValueHeadings.Any(c=>c.Key == cellValue))
+                                                cellValue = $"{cellValue}_{col}";
+
+                                            sqlValueHeadings.Add(cellValue, "nvarchar(500)");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        for (int col = start.Column; col <= end.Column; col++)
+                                        {
+                                            var cellValue = workSheet.Cells[startHeadingRow, col].Text;
+                                            sqlValueHeadings.Add($"col_{col}", "nvarchar(500)");
+                                        }
+                                    }
+
+                                    sbQueryBuilder.RemoveExistingTable(sqlDestinationTableName, ref parameters);
+                                    sbQueryBuilder.AppendColumnHeaders(sqlDestinationTableName, ref sqlValueHeadings);
+
+                                    using (IDbConnection cnn =
+                                        new SqlConnection(builder.ConnectionString))
+                                    {
+                                        if (cnn.State == ConnectionState.Closed)
+                                            cnn.Open();
+
+                                        var sql = sbQueryBuilder.ToString();
+
+                                        var result1 = cnn.ExecuteScalar<int>(sql, parameters);
+                                        cnn.Close();
+                                        //cnn.Dispose(); no no no! ne ne ne ne! ni ni ni!
+                                        sbQueryBuilder.Clear();
+                                        parameters = new DynamicParameters();
+                                        GC.Collect();
+                                    }
+                                    sbQueryBuilder.Clear();
+                                }
+
+                                //obviously starts at 1 for row
+
+                                for (int row = (start.Row + skip); row <= take; row++)
+                                {
+                                    var arr = new string[end.Column];
+                                    selectedRage.Add(arr);
                                     for (int col = start.Column; col <= end.Column; col++)
                                     {
-                                        var cellValue = workSheet.Cells[startHeadingRow, col].Text;
-                                        if (cellValue == null)
-                                            cellValue = $"col_{col}";
-                                        sqlValueHeadings.Add(cellValue, "nvarchar(500)");
+                                        var cellValue = workSheet.Cells[row, col].Text;
+                                        arr[col - 1] = cellValue;
                                     }
                                 }
-                                else
+
+                                ServiceMessage("Running - Skip" + skip);
+
+                                if (selectedRage.Any())
                                 {
-                                    for (int col = start.Column; col <= end.Column; col++)
+                                    sbQueryBuilder.AddBatch(
+                                      sqlDestinationTableName,
+                                      ref selectedRage,
+                                      ref sqlValueHeadings,
+                                      ref parameters);
+
+                                    using (IDbConnection cnn =
+                                        new SqlConnection(builder.ConnectionString))
                                     {
-                                        var cellValue = workSheet.Cells[startHeadingRow, col].Text;
-                                        sqlValueHeadings.Add($"col_{col}", "nvarchar(500)");
+                                        if (cnn.State == ConnectionState.Closed)
+                                            cnn.Open();
+
+                                        var sql = sbQueryBuilder.ToString();
+
+                                        ServiceMessage("Saving - Skip" + skip);
+                                        var result5 = cnn.ExecuteScalar<int>(sql, parameters);
+                                        cnn.Close();
+                                        //cnn.Dispose(); no no no! ne ne ne ne! ni ni ni!
+                                        sbQueryBuilder.Clear();
+                                        parameters = new DynamicParameters();
                                     }
                                 }
 
-                                sbQueryBuilder.RemoveExistingTable(sqlDestinationTableName, ref parameters);
-                                sbQueryBuilder.AppendColumnHeaders(sqlDestinationTableName, ref sqlValueHeadings);
-
-                                using (IDbConnection cnn =
-                                    new SqlConnection(builder.ConnectionString))
-                                {
-                                    if (cnn.State == ConnectionState.Closed)
-                                        cnn.Open();
-
-                                    var sql = sbQueryBuilder.ToString();
-
-                                    var result1 = cnn.ExecuteScalar<int>(sql, parameters);
-                                    cnn.Close();
-                                    //cnn.Dispose(); no no no! ne ne ne ne! ni ni ni!
-                                    sbQueryBuilder.Clear();
-                                    parameters = new DynamicParameters();
-                                    GC.Collect();
-                                }
-                                sbQueryBuilder.Clear();
+                                GC.Collect();
+                                skip += take;
                             }
-
-                            //obviously starts at 1 for row
-
-                            for (int row = (start.Row + skip); row <= take; row++)
-                            {
-                                var arr = new string[end.Column];
-                                selectedRage.Add(arr);
-                                for (int col = start.Column; col <= end.Column; col++)
-                                {
-                                    var cellValue = workSheet.Cells[row, col].Text;
-                                    arr[col-1] = cellValue;
-                                }
-                            }
-
-                            ServiceMessage("Running - Skip" + skip);
-
-                            if (selectedRage.Any())
-                            {
-                                sbQueryBuilder.AddBatch(
-                                  sqlDestinationTableName,
-                                  ref selectedRage,
-                                  ref sqlValueHeadings,
-                                  ref parameters);
-
-                                using (IDbConnection cnn =
-                                    new SqlConnection(builder.ConnectionString))
-                                {
-                                    if (cnn.State == ConnectionState.Closed)
-                                        cnn.Open();
-
-                                    var sql = sbQueryBuilder.ToString();
-
-                                    ServiceMessage("Saving - Skip" + skip);
-                                    var result5 = cnn.ExecuteScalar<int>(sql, parameters);
-                                    cnn.Close();
-                                    //cnn.Dispose(); no no no! ne ne ne ne! ni ni ni!
-                                    sbQueryBuilder.Clear();
-                                    parameters = new DynamicParameters();
-                                }
-                            }
-
-                            GC.Collect();
-                            skip += take;
                         }
+
+                        ServiceMessage("Running - Sleeping for a minute.");
+                        Thread.Sleep(10000);
                     }
-
-                    ServiceMessage("Running - Sleeping for a minute.");
-                    Thread.Sleep(10000);
                 }
-            }
-            catch(Exception ex)
-            {
-                ServiceMessage(ex.Message);
+                catch (Exception ex)
+                {
+                    ServiceMessage(ex.Message);
+                    EnableAllTextBoxes();
+                }
                 EnableAllTextBoxes();
-            }
-            EnableAllTextBoxes();
+
+            };
+            //bw.RunWorkerCompleted += (o, args) => MethodToUpdateControl();
+            bw.RunWorkerAsync();
+
+
         }
 
         private void ServiceMessage(string item)
@@ -287,7 +309,7 @@ namespace GoogleDriveExcelImporter
                     lstOutput.Items.Clear();
                 lstOutput.Items.Add(item);
             }));
-            Thread.Sleep(5000);
+            Thread.Sleep(500);
         }
 
         public static Boolean downloadFile(DriveService _service, Google.Apis.Drive.v2.Data.File _fileResource, string _saveTo)

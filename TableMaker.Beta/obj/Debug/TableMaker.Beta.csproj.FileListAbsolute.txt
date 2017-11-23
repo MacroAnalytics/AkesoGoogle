@@ -13,3 +13,11 @@ H:\DriveImporter\GoogleDriveExcelImporter\TableMaker.Beta\obj\Debug\TableMaker.B
 H:\DriveImporter\GoogleDriveExcelImporter\TableMaker.Beta\obj\Debug\TableMaker.Beta.csproj.CoreCompileInputs.cache
 H:\DriveImporter\GoogleDriveExcelImporter\TableMaker.Beta\obj\Debug\TableMaker.Beta.dll
 H:\DriveImporter\GoogleDriveExcelImporter\TableMaker.Beta\obj\Debug\TableMaker.Beta.pdb
+H:\AkesoGoogle\TableMaker.Beta\bin\Debug\TableMaker.Beta.dll
+H:\AkesoGoogle\TableMaker.Beta\bin\Debug\TableMaker.Beta.pdb
+H:\AkesoGoogle\TableMaker.Beta\bin\Debug\Dapper.dll
+H:\AkesoGoogle\TableMaker.Beta\bin\Debug\Dapper.xml
+H:\AkesoGoogle\TableMaker.Beta\obj\Debug\TableMaker.Beta.csprojResolveAssemblyReference.cache
+H:\AkesoGoogle\TableMaker.Beta\obj\Debug\TableMaker.Beta.csproj.CoreCompileInputs.cache
+H:\AkesoGoogle\TableMaker.Beta\obj\Debug\TableMaker.Beta.dll
+H:\AkesoGoogle\TableMaker.Beta\obj\Debug\TableMaker.Beta.pdb
